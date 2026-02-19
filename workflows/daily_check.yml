@@ -1,0 +1,22 @@
+name: Hourly KPI Bot
+on:
+  schedule:
+    - cron: '0 * * * *' 
+  workflow_dispatch: # Allows you to run it manually for testing
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: pip install psycopg2-binary requests
+      - name: Run Monitor
+        env:
+          NEON_URI: ${{ secrets.NEON_URI }}
+          SLACK_URL: ${{ secrets.SLACK_URL }}
+        run: python monitor.py
