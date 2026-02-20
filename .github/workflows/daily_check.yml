@@ -1,7 +1,8 @@
-name: Hourly KPI Bot
+name: Weekly KPI Bot
 on:
   schedule:
-    - cron: '0 * * * *' 
+    # Runs at 00:00 every Monday
+    - cron: '0 0 * * 1' 
   workflow_dispatch: # Allows you to run it manually for testing
 
 jobs:
