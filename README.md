@@ -1,6 +1,3 @@
-This is it—the finishing touch. A great README tells a story: Problem → Solution → Technology.
-
-Copy and paste this into your README.md. I have polished the language to sound professional, highlighting your use of cloud architecture and automated alerting.
 
 🚀 CEO Anomaly Detection & KPI Alert System
 An automated, serverless data pipeline designed to shift business intelligence from reactive to proactive. This system monitors live revenue streams in a cloud database and pushes instant alerts to stakeholders when performance anomalies are detected.
