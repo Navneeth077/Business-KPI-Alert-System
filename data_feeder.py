@@ -1,3 +1,4 @@
+MODE = "live"  # or "synthetic"
 import requests
 import psycopg2
 import time
