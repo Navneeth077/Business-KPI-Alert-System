@@ -1,48 +1,54 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
-pip install psycopg2-binary pandas python-dotenv
-
-
-# In[3]:
-
-
+import requests
 import psycopg2
-import random
 import time
-from datetime import datetime
+import os
+from dotenv import load_dotenv
 
-# Connection setup 
+load_dotenv()
 DB_URI = os.getenv("NEON_URI")
-def insert_mock_transaction():
-    conn = psycopg2.connect(DB_URI)
-    cur = conn.cursor()
-    
-    # Generate random business data
-    revenue = round(random.uniform(100, 5000), 2)
-    costs = revenue * random.uniform(0.4, 0.7) # 40-70% margin
-    segments = ['Enterprise', 'SMB', 'Startup']
-    
-    cur.execute("""
-        INSERT INTO ceo_sales_data (revenue, customer_segment, operating_costs, units_sold)
-        VALUES (%s, %s, %s, %s)
-    """, (revenue, random.choice(segments), costs, random.randint(1, 50)))
-    
-    conn.commit()
-    cur.close()
-    conn.close()
-    print(f"Transaction injected at {datetime.now()}")
 
-# Run this every 10 seconds to simulate a live business
+conn = psycopg2.connect(DB_URI)
+cur = conn.cursor()
+
+def fetch_crypto():
+    url = "https://api.coingecko.com/api/v3/simple/price"
+    
+    params = {
+        "ids": "bitcoin",
+        "vs_currencies": "usd",
+        "include_24hr_vol": "true"
+    }
+    
+    data = requests.get(url, params=params).json()
+    
+    price = data["bitcoin"]["usd"]
+    volume = data["bitcoin"]["usd_24h_vol"]
+    
+    return price, volume
+
+def insert_live_data():
+    try:
+        price, volume = fetch_crypto()
+        
+        # Convert to "business metrics"
+        revenue = price * 0.01  # simulate trading revenue
+        costs = revenue * 0.6
+        
+        cur.execute("""
+            INSERT INTO ceo_sales_data 
+            (revenue, customer_segment, operating_costs, units_sold)
+            VALUES (%s, %s, %s, %s)
+        """, (revenue, "Crypto", costs, int(volume % 50)))
+        
+        conn.commit()
+        print("Live data inserted")
+
+    except Exception as e:
+        print("Error:", e)
+
 while True:
-    insert_mock_transaction()
-    time.sleep(10)
-
-
-# In[ ]:
+    insert_live_data()
+    time.sleep(60)  # avoid rate limits
 
 
 
